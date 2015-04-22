@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Game of Thrones Quiz</string>
+
+    <string name="question_text">GoT Question Text</string>
+    <string name="true_button">Yes, m\'lord</string>
+    <string name="false_button">No, m\'lord</string>
+    <string name="next_button">Next...</string>
+
+    <string name="correct">You are correct.</string>
+    <string name="incorrect">You don\'t know anything Jon Snow</string>
+
+    <string name="question_first">Was Tyrion Lannister\'s first wife was a whore?</string>
+    <string name="question_second">Did Joffrey Baratheon mounted Ned Stark\'s head on a spike?</string>
+    <string name="question_third">Is Cersei Lanister really a "Brother F#$\%er"?</string>
+    <string name="question_four">Did John Snow ever break his vows of the Nights Watch?</string>
+    <string name="question_five">Did Samuel Tarley pee himself when he killed the white walker?</string>
+
+    <string name="action_settings">Settings</string>
+</resources>
