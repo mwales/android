@@ -1,5 +1,6 @@
 package net.mwales.gotquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
+import android.content.Intent;
 
 
 public class GotActivity extends ActionBarActivity {
@@ -19,11 +21,17 @@ public class GotActivity extends ActionBarActivity {
 
     private Button mNextButton;
 
+    private Button mCheatButton;
+
+    private Boolean mCheatActivated;
+
     private int mQuestionIndex = 0;
 
     private static final String BUNDLE_INDEX = "SavedIndex";
 
     private static final String TAG = "GotQuiz";
+
+
 
     private QuizQuestion[] mQuestions = new QuizQuestion[] {
             new QuizQuestion(R.string.question_first, false),
@@ -51,6 +59,7 @@ public class GotActivity extends ActionBarActivity {
         mFalseButton = (Button) findViewById(R.id.false_button);
         mQuestionText = (TextView) findViewById(R.id.quiz_question);
         mNextButton = (Button) findViewById(R.id.next_button);
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
 
         displayQuestion(mQuestionIndex);
 
@@ -78,6 +87,18 @@ public class GotActivity extends ActionBarActivity {
                 GotActivity.this.nextQuestion();
             }
         });
+
+        mCheatButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent i = new Intent(GotActivity.this, CheatActivity.class);
+                i.putExtra(CheatActivity.CHEAT_ANSWER_KEY, mQuestions[mQuestionIndex].getAnswerTrue());
+                //startActivity(i);
+                startActivityForResult(i, 0);
+            }
+        });
     }
 
     public void displayResult(boolean correct)
@@ -86,7 +107,14 @@ public class GotActivity extends ActionBarActivity {
 
         if (correct)
         {
-            Toast.makeText(this, R.string.correct, Toast.LENGTH_SHORT).show();
+            if (mQuestions[mQuestionIndex].getCheated())
+            {
+                Toast.makeText(this, R.string.judgement_message, Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(this, R.string.correct, Toast.LENGTH_SHORT).show();
+            }
         }
         else
         {
@@ -106,6 +134,8 @@ public class GotActivity extends ActionBarActivity {
     {
         Log.d(TAG, "displayQuestion started");
         mQuestionText.setText(mQuestions[index].getQuestionId());
+
+        mCheatActivated = false;
     }
 
 
@@ -174,5 +204,35 @@ public class GotActivity extends ActionBarActivity {
         outState.putInt(BUNDLE_INDEX, mQuestionIndex);
 
         Log.d(TAG, "Saved State.  Index=" + mQuestionIndex);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        //super.onActivityResult(requestCode, resultCode, data);
+
+        if (data == null)
+        {
+            Log.e(TAG, "Null activity result received");
+            return;
+        }
+
+        if (requestCode != 0)
+        {
+            Log.e(TAG, "Activy result request code unexpected");
+        }
+
+        if (requestCode != RESULT_OK)
+        {
+            Log.e(TAG, "Activity result code unexpected");
+        }
+
+        mCheatActivated = data.getBooleanExtra(CheatActivity.CHEAT_ACTIVATED, false);
+
+        if (mCheatActivated)
+        {
+            mQuestions[mQuestionIndex].setCheated(true);
+            Log.d(TAG, "Cheat detected");
+        }
     }
 }

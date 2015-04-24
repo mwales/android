@@ -5,6 +5,7 @@
     <string name="true_button">Yes, m\'lord</string>
     <string name="false_button">No, m\'lord</string>
     <string name="next_button">Next...</string>
+    <string name="cheat_button">Pray to the Gods</string>
 
     <string name="correct">You are correct.</string>
     <string name="incorrect">You don\'t know anything Jon Snow</string>
@@ -14,6 +15,11 @@
     <string name="question_third">Is Cersei Lanister really a "Brother F#$\%er"?</string>
     <string name="question_four">Did John Snow ever break his vows of the Nights Watch?</string>
     <string name="question_five">Did Samuel Tarley pee himself when he killed the white walker?</string>
+
+    <string name="cheat_warning">Are you sure you want to do this?</string>
+    <string name="cheat_confirm">Bring me ale and wenches!</string>
+    <string name="judgement_message">Once you’ve accepted your flaws, no one can use them against you.</string>
+    <string name="answer_placeholder">--- Answer ---</string>
 
     <string name="action_settings">Settings</string>
 </resources>

@@ -9,6 +9,7 @@ public class QuizQuestion {
     {
         setQuestionId(questionId);
         setAnswerTrue(answerIsTrue);
+        setCheated(false);
     }
     public int getQuestionId() {
         return mQuestionId;
@@ -29,5 +30,17 @@ public class QuizQuestion {
     private int mQuestionId;
 
     private boolean mAnswerTrue;
+
+    public boolean getCheated()
+    {
+        return mCheated;
+    }
+
+    public void setCheated(boolean cheated)
+    {
+        mCheated = cheated;
+    }
+
+    private boolean mCheated;
 
 }
