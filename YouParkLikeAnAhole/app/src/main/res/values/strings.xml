@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">You Park Like An Ahole</string>
+
+    <string name="description_label">Description:</string>
+    <string name="default_job_description">Enter description of this nice parking job</string>
+
+    <string name="action_settings">Settings</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
