@@ -10,8 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import net.mwales.youparklikeanahole.ParkingJobModel;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -36,6 +40,8 @@ public class DetailsFragment extends Fragment
     private ParkingJobModel mPJ;
 
     private OnFragmentInteractionListener mListener;
+
+    private Button mSubmitButton;
 
     /**
      * Use this factory method to create a new instance of
@@ -62,6 +68,9 @@ public class DetailsFragment extends Fragment
     public DetailsFragment()
     {
         // Required empty public constructor
+        mPJ = new ParkingJobModel();
+
+        Log.d("NPJ", "Details Fragment constructor");
     }
 
     @Override
@@ -74,7 +83,7 @@ public class DetailsFragment extends Fragment
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        mPJ = new ParkingJobModel();
+
     }
 
     @Override
@@ -85,6 +94,8 @@ public class DetailsFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_details, container, false);
 
         Log.d("NPJ", "onCreateView called");
+
+
 
 
         EditText et = (EditText) v.findViewById(R.id.job_description);
@@ -113,6 +124,29 @@ public class DetailsFragment extends Fragment
                 Log.d("NPJ", "EditText::afterTextChanged called");
             }
         });
+
+        mSubmitButton = (Button) v.findViewById(R.id.submit_button);
+
+        mSubmitButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Date now = new Date();
+
+                DetailsFragment.this.setDate(now);
+            }
+        });
+
+        if (mPJ.getDate() != null)
+        {
+            setDate(mPJ.getDate());
+        }
+
+        if (!mPJ.getDescription().isEmpty())
+        {
+            et.setText(mPJ.getDescription());
+        }
 
         return v;
     }
@@ -162,6 +196,15 @@ public class DetailsFragment extends Fragment
     {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    public void setDate(Date submitDate)
+    {
+        mPJ.setDate(submitDate);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a");
+
+        mSubmitButton.setText( sdf.format(submitDate) );
     }
 
 }

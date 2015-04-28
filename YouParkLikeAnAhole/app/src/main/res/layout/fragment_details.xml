@@ -1,17 +1,3 @@
-<!--
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="net.mwales.youparklikeanahole.DetailsFragment">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"/>
-
-</FrameLayout> -->
-
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
@@ -20,15 +6,36 @@
               android:orientation="vertical"
               tools:context=".MainActivity$PlaceholderFragment">
 
-<TextView
-    android:text="@string/description_label"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"/>
+    <TextView
+        android:text="@string/description_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
-<EditText
-    android:id="@+id/job_description"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:hint="@string/default_job_description"/>
+    <EditText
+        android:id="@+id/job_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/default_job_description"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details_label" />
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/timestamp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
+
+    <CheckBox
+        android:id="@+id/identified"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ahole_identified"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
 
 </LinearLayout>

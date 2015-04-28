@@ -1,12 +1,20 @@
 package net.mwales.youparklikeanahole;
 
+import java.util.Date;
+
 /**
  * Created by mwales on 4/24/15.
  */
 public class ParkingJobModel
 {
+    public ParkingJobModel()
+    {
+        mId = -1;
+        mCulprit = "";
+        mDescription = "";
+        mDate = null;
+    }
 
-    private int mId;
 
     public String getDescription()
     {
@@ -28,5 +36,31 @@ public class ParkingJobModel
         mId = id;
     }
 
+    public String getCulprit()
+    {
+        return mCulprit;
+    }
+
+    public void setCulprit(String culprit)
+    {
+        mCulprit = culprit;
+    }
+
+    public Date getDate()
+    {
+        return mDate;
+    }
+
+    public void setDate(Date date)
+    {
+        mDate = date;
+    }
+
+    private String mCulprit;
+
     private String mDescription;
+
+    private int mId;
+
+    private Date mDate;
 }
