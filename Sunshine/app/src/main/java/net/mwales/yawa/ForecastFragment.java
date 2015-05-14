@@ -1,6 +1,7 @@
 package net.mwales.yawa;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -14,8 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import net.mwales.yawa.R;
 
@@ -34,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Vector;
 
 
 /**
@@ -46,8 +50,16 @@ public class ForecastFragment extends Fragment
 
     ArrayAdapter<String> _weatherAdapter;
 
+    Vector<Date> _passStartTimes;
+    Vector<Integer> _passDurations;
+
+    double _latitude;
+    double _longitude;
+
     public ForecastFragment()
     {
+        _passStartTimes = new Vector<Date>();
+        _passDurations = new Vector<Integer>();
     }
 
     @Override
@@ -92,9 +104,36 @@ public class ForecastFragment extends Fragment
 
         _weatherAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, dummyWeatherData);
 
+
+
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
 
         lv.setAdapter(_weatherAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                //Toast popupMessage = new Toast(ForecastFragment.this.getActivity());
+
+                //popupMessage.setText("You clicked on item" + position);
+                //popupMessage.setDuration(Toast.LENGTH_SHORT);
+                //popupMessage.show();
+
+                //Toast.makeText(ForecastFragment.this.getActivity(), "You clicked on item " + position, Toast.LENGTH_SHORT).show();
+                Intent detailsIntent = new Intent();
+                detailsIntent.setClass(getActivity(), DetailsActivity.class);
+                detailsIntent.putExtra("net.mwales.yawa.latitude", _latitude);
+                detailsIntent.putExtra("net.mwales.yawa.longitude", _longitude);
+                detailsIntent.putExtra("net.mwales.yawa.passStart", _passStartTimes.get(position).getTime());
+                detailsIntent.putExtra("net.mwales.yawa.passDuration", _passDurations.get(position).intValue());
+
+                startActivity(detailsIntent);
+
+
+            }
+        });
 
         return rootView;
     }
@@ -150,6 +189,9 @@ public class ForecastFragment extends Fragment
         // API doesn't like altitude less than 0, but that is valid in real life (death valley duh)
         if (altitude <= 0)
             altitude = 0.1;
+
+        _latitude = latitude;
+        _longitude = longitude;
 
         Uri.Builder retVal = new Uri.Builder();
         retVal.scheme("http")
@@ -253,6 +295,8 @@ public class ForecastFragment extends Fragment
             Log.d(TAG, "PostExecute called with string length: " + s.length());
 
             ForecastFragment.this._weatherAdapter.clear();
+            ForecastFragment.this._passDurations.clear();
+            ForecastFragment.this._passStartTimes.clear();
 
             try
             {
@@ -277,6 +321,8 @@ public class ForecastFragment extends Fragment
                     Date risetime = new Date(ro.getLong("risetime") * MS_PER_SEC);
 
                     Log.d(TAG, "Pass Start Time = " + risetime.toString() + ", duration=" + passDuration);
+                    ForecastFragment.this._passStartTimes.add(risetime);
+                    ForecastFragment.this._passDurations.add(new Integer(passDuration));
 
                     ForecastFragment.this._weatherAdapter.add("Pass Start Time = " + risetime.toString() + "\n   Duration=" + passDuration);
 
