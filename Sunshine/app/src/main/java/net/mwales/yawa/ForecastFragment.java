@@ -18,21 +18,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import net.mwales.yawa.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,7 +41,7 @@ import java.util.Vector;
 public class ForecastFragment extends Fragment
 {
 
-    private final String TAG = "YAWA-ForecastFrag";
+    private final String TAG = getClass().getSimpleName();
 
     ArrayAdapter<String> _weatherAdapter;
 
@@ -71,35 +66,25 @@ public class ForecastFragment extends Fragment
         setHasOptionsMenu(true);
 
         ArrayList<String> dummyWeatherData = new ArrayList<>();
-        dummyWeatherData.add("Today - Sexy - 85 / 90");
-        dummyWeatherData.add("Tomorrow - Cold - 1 / 2");
-        dummyWeatherData.add("Monday - Work - 65 / 68");
-        dummyWeatherData.add("Tuesday - Dumb - 3 / 90");
-        dummyWeatherData.add("Tuesday - Dumb - 3 / 90");
-        dummyWeatherData.add("Wednesday - Android Shit - 4 / 90");
-        dummyWeatherData.add("Friday - Dog Shit - 5 / 90");
-        dummyWeatherData.add("Saturday - Scaturday - 6 / 90");
-        dummyWeatherData.add("Sunday - Humpiness - 7 / 90");
-        dummyWeatherData.add("Tuesday - Dumb - 3 / 90");
-        dummyWeatherData.add("Wednesday - Android Shit - 4 / 90");
-        dummyWeatherData.add("Friday - Dog Shit - 5 / 90");
-        dummyWeatherData.add("Saturday - Scaturday - 6 / 90");
-        dummyWeatherData.add("Sunday - Humpiness - 7 / 90");
-        dummyWeatherData.add("Wednesday - Android Shit - 4 / 90");
-        dummyWeatherData.add("Friday - Dog Shit - 5 / 90");
-        dummyWeatherData.add("Saturday - Scaturday - 6 / 90");
-        dummyWeatherData.add("Sunday - Humpiness - 7 / 90");
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        if (lm == null)
+        if ( lm == null)
         {
-            dummyWeatherData.add("Couldn't get location data");
+            dummyWeatherData.add("Couldn't get location services");
         }
         else
         {
             Location lastKnownLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            dummyWeatherData.add("Lat = " + lastKnownLoc.getLatitude() + ", Long=" + lastKnownLoc.getLongitude() + ", Alt=" + lastKnownLoc.getAltitude() );
+
+            if (lastKnownLoc == null)
+            {
+                dummyWeatherData.add("Couldn't get last known location");
+            }
+            else
+            {
+                dummyWeatherData.add("Lat = " + lastKnownLoc.getLatitude() + ", Long=" + lastKnownLoc.getLongitude() + ", Alt=" + lastKnownLoc.getAltitude());
+            }
         }
 
         _weatherAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, dummyWeatherData);
@@ -115,13 +100,7 @@ public class ForecastFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                //Toast popupMessage = new Toast(ForecastFragment.this.getActivity());
-
-                //popupMessage.setText("You clicked on item" + position);
-                //popupMessage.setDuration(Toast.LENGTH_SHORT);
-                //popupMessage.show();
-
-                //Toast.makeText(ForecastFragment.this.getActivity(), "You clicked on item " + position, Toast.LENGTH_SHORT).show();
+                // Create an intent to launch details activitiy when item clicked
                 Intent detailsIntent = new Intent();
                 detailsIntent.setClass(getActivity(), DetailsActivity.class);
                 detailsIntent.putExtra("net.mwales.yawa.latitude", _latitude);
@@ -130,8 +109,6 @@ public class ForecastFragment extends Fragment
                 detailsIntent.putExtra("net.mwales.yawa.passDuration", _passDurations.get(position).intValue());
 
                 startActivity(detailsIntent);
-
-
             }
         });
 
@@ -149,18 +126,29 @@ public class ForecastFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId() == R.id.action_refresh)
-        {
-            Log.d(TAG, "Refresh menu action started");
+        Log.d(TAG, "options menu item selected = " + item.getItemId());
 
-            FetchWebpage downloaderTask = new FetchWebpage();
-            downloaderTask.execute(getUrl(27.78029944,-80.62091783, 0));
-            return true;
-        }
-        else
+        switch (item.getItemId())
         {
-            Log.d(TAG, "Unknown menu item selected");
-            return super.onOptionsItemSelected(item);
+            case R.id.action_refresh:
+
+                Log.d(TAG, "Refresh menu action started");
+
+                FetchWebpage downloaderTask = new FetchWebpage();
+                downloaderTask.execute(getUrl(27.78029944,-80.62091783, 0));
+                return true;
+
+            case R.id.action_settings:
+
+                Log.d(TAG, "Settings menu selected");
+                Intent launchSettings = new Intent();
+                launchSettings.setClass(getActivity(), SettingsActivity.class);
+                startActivity(launchSettings);
+                return true;
+
+            default:
+                Log.d(TAG, "Unknown menu item selected");
+                return super.onOptionsItemSelected(item);
         }
 
 

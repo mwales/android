@@ -1,5 +1,6 @@
 package net.mwales.yawa;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,8 @@ import java.util.Date;
 public class DetailsActivity extends ActionBarActivity
 {
 
-    @Override
+    private final String TAG = getClass().getSimpleName();
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -50,12 +52,19 @@ public class DetailsActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
+        switch(id)
         {
-            return true;
+            case R.id.action_settings:
+                Log.d(TAG, "Starting settings activity");
+                Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(startSettingsActivity);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     /**

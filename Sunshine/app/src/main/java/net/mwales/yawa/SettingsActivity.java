@@ -1,38 +1,31 @@
 package net.mwales.yawa;
 
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import net.mwales.yawa.ForecastFragment;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.mwales.yawa.SettingsFragment;
 
 
-public class MainActivity extends ActionBarActivity
+public class SettingsActivity extends ActionBarActivity
 {
 
-    @Override
+    private final String TAG = getClass().getSimpleName();
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_settings);
         if (savedInstanceState == null)
         {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
+            getFragmentManager().beginTransaction()
+                    .add(R.id.settingsContainer, new SettingsFragment())
                     .commit();
         }
     }
@@ -42,7 +35,7 @@ public class MainActivity extends ActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
 
@@ -57,7 +50,11 @@ public class MainActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
         {
-            //return true;
+            Log.d(TAG, "Starting settings activity");
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
+
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
