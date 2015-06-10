@@ -2,11 +2,13 @@ package net.mwales.yawa;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,6 +68,31 @@ public class ForecastFragment extends Fragment
         setHasOptionsMenu(true);
 
         ArrayList<String> dummyWeatherData = new ArrayList<>();
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+
+        if (sp == null)
+        {
+            Log.e(TAG, "Error getting the shared preferences");
+        }
+        else
+        {
+            Log.d(TAG, "Successfully retrieved shared preferences");
+
+            boolean useGps = sp.getBoolean("pref_use_gps", false);
+
+            String latStr = sp.getString("pref_latitude", "0.0");
+            double lat = Double.parseDouble(latStr);
+
+            String lngStr = sp.getString("pref_longitude", "0.0");
+            double lng = Double.parseDouble(lngStr);
+
+            String altStr = sp.getString("pref_altitude", "0.0");
+            double alt = Double.parseDouble(altStr);
+
+            Log.d(TAG, "preferences:  useGps=" + useGps + ", lat=" + lat + ", long=" + lng + ", alt=" + alt);
+        }
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -135,7 +162,8 @@ public class ForecastFragment extends Fragment
                 Log.d(TAG, "Refresh menu action started");
 
                 FetchWebpage downloaderTask = new FetchWebpage();
-                downloaderTask.execute(getUrl(27.78029944,-80.62091783, 0));
+                //downloaderTask.execute(getUrl(27.78029944,-80.62091783, 0));
+                downloaderTask.execute(getUrlViaLocation());
                 return true;
 
             case R.id.action_settings:
@@ -154,22 +182,61 @@ public class ForecastFragment extends Fragment
 
     }
 
-    private String getUrlViaGps()
-    {
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        if (lm == null)
+    private String getUrlViaLocation()
+    {
+        final double KSC_LAT = 28.608082;
+        final double KSC_LONG = -80.604089;
+        final double KSC_ALT = 1;
+
+        boolean useGps = false;
+        double lat = KSC_LAT;
+        double lng = KSC_LONG;
+        double alt = KSC_ALT;
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        if (sp == null)
         {
-            final double KSC_LAT = 28.608082;
-            final double KSC_LONG = -80.604089;
-            final double KSC_ALT = 1;
-            return getUrl(KSC_LAT, KSC_LONG, KSC_ALT);
+            Log.e(TAG, "Error getting the shared preferences");
         }
         else
         {
-            Location lastKnownLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            return getUrl(lastKnownLoc.getLatitude(), lastKnownLoc.getLongitude(), lastKnownLoc.getAltitude() );
+            Log.d(TAG, "Successfully retrieved shared preferences");
+
+            useGps = sp.getBoolean("pref_use_gps", false);
+
+            String latStr = sp.getString("pref_latitude", "0.0");
+            lat = Double.parseDouble(latStr);
+
+            String lngStr = sp.getString("pref_longitude", "0.0");
+            lng = Double.parseDouble(lngStr);
+
+            String altStr = sp.getString("pref_altitude", "0.0");
+            alt = Double.parseDouble(altStr);
+
+            Log.d(TAG, "preferences:  useGps=" + useGps + ", lat=" + lat + ", long=" + lng + ", alt=" + alt);
         }
+        if (useGps)
+        {
+            LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            if (lm == null)
+            {
+                Log.e(TAG, "Failed to get good location manager reference");
+            }
+            else
+            {
+                Location lastKnownLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                lat = lastKnownLoc.getLatitude();
+                lng = lastKnownLoc.getLongitude();
+                alt = lastKnownLoc.getAltitude();
+
+                Log.d(TAG, "GPS Location Info: lat=" + lat + ", long=" + lng + ", alt=" + alt);
+            }
+        }
+
+        return getUrl(lat, lng, alt);
     }
 
     private String getUrl(double latitude, double longitude, double altitude)
