@@ -1,16 +1,20 @@
 #include <QWheelEvent>
 #include <QGraphicsView>
 #include <QtDebug>
+#include <QDir>
+#include <QMessageBox>
+
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-MainWindow::MainWindow(QString imageFile, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
    QMainWindow(parent),
-   ui(new Ui::MainWindow)
+   ui(new Ui::MainWindow),
+   theCurImageIndex(0)
 {
    ui->setupUi(this);
 
-   ui->thePic->setPicture(imageFile);
+
 
    theDragModeStrings.insert(QGraphicsView::NoDrag, "No Drag Mode");
    theDragModeStrings.insert(QGraphicsView::RubberBandDrag, "Selection Mode");
@@ -29,6 +33,18 @@ MainWindow::MainWindow(QString imageFile, QWidget *parent) :
            this, SLOT(movePageSelectionDown()));
    connect(ui->theDeleteButton, SIGNAL(clicked()),
            this, SLOT(deletePageSelection()));
+
+   // Want to know when the Process Images button should be enabled.  The rectangleSelection and deletePageSelection
+   // button are the two buttons that effect the number of items in the list
+   connect(ui->thePic, SIGNAL(rectangleSelected(QPoint,QPoint)),
+           this, SLOT(pageSelectionListChanged()));
+   connect(ui->theDeleteButton, SIGNAL(clicked()),
+           this, SLOT(pageSelectionListChanged()));
+
+   connect(ui->theNextImageButton, SIGNAL(clicked()),
+           this, SLOT(nextImage()));
+   connect(ui->thePreviousImageButton, SIGNAL(clicked()),
+           this, SLOT(previousImage()));
 
    updateStatusBar(ui->thePic->dragMode());
 }
@@ -52,10 +68,7 @@ void MainWindow::rectangleSelection(QPoint start, QPoint end)
 
    thePagePointsList.append( PagePoints(start, end) );
 
-   //QString pageDescription = QString("(%1, %2) and (%3, %4)").arg(start.x()).arg(start.y()).arg(end.x()).arg(end.y());
    QString pageDescription = pagePointsToString(PagePoints(start, end));
-
-   //pageDescription << "(" << start.x() << ", " << start.y() << ") and (" << end.x() << ", " << end.y() << ")";
 
    ui->thePagePoints->addItem(pageDescription);
 }
@@ -127,4 +140,69 @@ void MainWindow::movePageSelectionDown()
 QString MainWindow::pagePointsToString(PagePoints pp)
 {
    return QString("(%1, %2) and (%3, %4)").arg(pp.first.x()).arg(pp.first.y()).arg(pp.second.x()).arg(pp.second.y());
+}
+
+void MainWindow::loadImagePath(QString imagePath)
+{
+   QStringList filters;
+   filters << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.ppm" << "*.xbm" << "*.xpm";
+   QDir fileListing(imagePath);
+
+   if (!fileListing.exists())
+   {
+      QMessageBox::critical(this, "Directory Does Not Exist", QString("Path %1 does not exist").arg(imagePath));
+      return;
+   }
+
+   theImageFiles = fileListing.entryList(filters, QDir::Files | QDir::NoDotAndDotDot,QDir::Name);
+
+   qDebug() << "Scanning the direcotry " << fileListing.absolutePath() << " for files";
+   qDebug() << "Found the follwoing files: " << theImageFiles;
+
+   if (fileListing.count() == 0)
+   {
+      QMessageBox::critical(this, "No images found", QString("Path %1 does not have any images").arg(imagePath));
+      return;
+   }
+
+   theCurImageIndex = 0;
+   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
+
+   ui->theImagesFoundLabel->setText(QString("Images Found: %1").arg(theImageFiles.count()));
+}
+
+void MainWindow::pageSelectionListChanged()
+{
+   qDebug() << __PRETTY_FUNCTION__ ;
+
+   if (thePagePointsList.count() == 0)
+   {
+      // Disable the process images button
+      ui->theProcessImagesButton->setEnabled(false);
+   }
+   else
+   {
+      // Enabled the process images button
+      ui->theProcessImagesButton->setEnabled(true);
+   }
+}
+
+void MainWindow::nextImage()
+{
+   theCurImageIndex = (theCurImageIndex + 1) % theImageFiles.count();
+   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
+
+   qDebug() << "Setting the image to" << theImageFiles[theCurImageIndex];
+}
+
+void MainWindow::previousImage()
+{
+   theCurImageIndex = (theCurImageIndex - 1);
+
+   if (theCurImageIndex == -1)
+      theCurImageIndex = theImageFiles.count() - 1;
+
+   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
+
+   qDebug() << "Setting the image to" << theImageFiles[theCurImageIndex];
 }

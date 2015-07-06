@@ -25,8 +25,6 @@ void PictureView::setPicture(QString filename)
    setDragMode(QGraphicsView::RubberBandDrag);
 
    setRubberBandSelectionMode(Qt::ContainsItemShape);
-
-   //scale(0.5, 0.5);
 }
 
 void PictureView::wheelEvent(QWheelEvent* ev)
@@ -80,10 +78,6 @@ void PictureView::mouseReleaseEvent(QMouseEvent * event)
 
       emit rectangleSelected(theRectStart, rectStop);
    }
-
-   QPointF scenePoint = mapToScene(event->pos());
-
-   QPoint rectStop = QPoint( (int) scenePoint.x(), (int) scenePoint.y() );
 
    QGraphicsView::mouseReleaseEvent(event);
 }
