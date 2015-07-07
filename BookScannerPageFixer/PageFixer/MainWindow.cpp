@@ -3,18 +3,19 @@
 #include <QtDebug>
 #include <QDir>
 #include <QMessageBox>
+#include <QThreadPool>
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "DocumentWriter.h"
 
 MainWindow::MainWindow(QWidget *parent) :
    QMainWindow(parent),
    ui(new Ui::MainWindow),
-   theCurImageIndex(0)
+   theCurImageIndex(0),
+   theProcessingInProgressFlag(false)
 {
    ui->setupUi(this);
-
-
 
    theDragModeStrings.insert(QGraphicsView::NoDrag, "No Drag Mode");
    theDragModeStrings.insert(QGraphicsView::RubberBandDrag, "Selection Mode");
@@ -37,14 +38,17 @@ MainWindow::MainWindow(QWidget *parent) :
    // Want to know when the Process Images button should be enabled.  The rectangleSelection and deletePageSelection
    // button are the two buttons that effect the number of items in the list
    connect(ui->thePic, SIGNAL(rectangleSelected(QPoint,QPoint)),
-           this, SLOT(pageSelectionListChanged()));
+           this, SLOT(isImageProcessingAllowed()));
    connect(ui->theDeleteButton, SIGNAL(clicked()),
-           this, SLOT(pageSelectionListChanged()));
+           this, SLOT(isImageProcessingAllowed()));
 
    connect(ui->theNextImageButton, SIGNAL(clicked()),
            this, SLOT(nextImage()));
    connect(ui->thePreviousImageButton, SIGNAL(clicked()),
            this, SLOT(previousImage()));
+
+   connect(ui->theProcessImagesButton, SIGNAL(clicked()),
+           this, SLOT(processImages()));
 
    updateStatusBar(ui->thePic->dragMode());
 }
@@ -144,6 +148,8 @@ QString MainWindow::pagePointsToString(PagePoints pp)
 
 void MainWindow::loadImagePath(QString imagePath)
 {
+   theImagePath = imagePath;
+
    QStringList filters;
    filters << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.ppm" << "*.xbm" << "*.xpm";
    QDir fileListing(imagePath);
@@ -166,14 +172,21 @@ void MainWindow::loadImagePath(QString imagePath)
    }
 
    theCurImageIndex = 0;
-   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
+   updatePicture();
 
    ui->theImagesFoundLabel->setText(QString("Images Found: %1").arg(theImageFiles.count()));
 }
 
-void MainWindow::pageSelectionListChanged()
+void MainWindow::isImageProcessingAllowed()
 {
    qDebug() << __PRETTY_FUNCTION__ ;
+
+   if (theProcessingInProgressFlag)
+   {
+      // If image processing in progress, always disable the button
+      ui->theProcessImagesButton->setEnabled(false);
+      return;
+   }
 
    if (thePagePointsList.count() == 0)
    {
@@ -190,9 +203,7 @@ void MainWindow::pageSelectionListChanged()
 void MainWindow::nextImage()
 {
    theCurImageIndex = (theCurImageIndex + 1) % theImageFiles.count();
-   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
-
-   qDebug() << "Setting the image to" << theImageFiles[theCurImageIndex];
+   updatePicture();
 }
 
 void MainWindow::previousImage()
@@ -202,7 +213,76 @@ void MainWindow::previousImage()
    if (theCurImageIndex == -1)
       theCurImageIndex = theImageFiles.count() - 1;
 
-   ui->thePic->setPicture(theImageFiles[theCurImageIndex]);
+   updatePicture();
+}
+
+void MainWindow::updatePicture()
+{
+   QString picturePath = theImagePath + QDir::separator() + theImageFiles[theCurImageIndex];
+
+   ui->thePic->setPicture(QDir::cleanPath(picturePath));
 
    qDebug() << "Setting the image to" << theImageFiles[theCurImageIndex];
 }
+
+void MainWindow::processImages()
+{
+   qDebug() << __PRETTY_FUNCTION__;
+
+   theProcessingInProgressFlag = true;
+   isImageProcessingAllowed();
+
+   ui->theImagesProcessedLabel->setText("Start");
+   ui->theImagesProcessedPb->setValue(0);
+
+   DocumentWriter* dw = new DocumentWriter();
+
+   // Connect callbacks
+   connect(dw, SIGNAL(JobSuccessful()),
+           this, SLOT(imageProcessingComplete()));
+   connect(dw, SIGNAL(JobFailed(QString)),
+           this, SLOT(imageProcessingError(QString)));
+   connect(dw, SIGNAL(JobPercentComplete(int,int)),
+           this, SLOT(imageProcessingStatus(int,int)));
+
+   // Start the job asynchronously
+   QThreadPool::globalInstance()->start(dw);
+}
+
+void MainWindow::imageProcessingComplete()
+{
+   qDebug() << __PRETTY_FUNCTION__;
+
+   ui->theImagesProcessedLabel->setText("Done!");
+
+   // Image processing is allowed again
+   theProcessingInProgressFlag = false;
+   isImageProcessingAllowed();
+}
+
+
+
+void MainWindow::imageProcessingError(QString reason)
+{
+   qDebug() << __PRETTY_FUNCTION__;
+
+   // Image processing is allowed again
+   theProcessingInProgressFlag = false;
+   isImageProcessingAllowed();
+
+   ui->theImagesProcessedLabel->setText("Error");
+
+   ui->theImagesProcessedPb->setValue(0);
+
+   QMessageBox::critical(this, "Error processing images", reason);
+}
+
+void MainWindow::imageProcessingStatus(int complete, int total)
+{
+   QString progressLabel = QString("( %1 / %2 )").arg(complete).arg(total);
+   ui->theImagesProcessedLabel->setText(progressLabel);
+
+   ui->theImagesProcessedPb->setMaximum(total);
+   ui->theImagesProcessedPb->setValue(complete);
+}
+

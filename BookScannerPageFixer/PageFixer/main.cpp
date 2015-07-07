@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include <QApplication>
 #include <QtDebug>
+#include <QFileDialog>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
@@ -12,16 +14,34 @@ int main(int argc, char *argv[])
    /// @todo If the user gives options for --aboutqt, pop up the About Qt dialog for LGPL conformance
    /// @todo If we get really fance, make a QSettings and show About Qt as 1-time viewing dialog
 
-   if (argc != 2)
+   if (argc == 1)
    {
-      // TODO:  Open a dialog to let user choose file path
+      /// @todo  Open a dialog to let user choose file path
+      QString dir = QFileDialog::getExistingDirectory(0, "Open Directory",
+                                                      "/home",
+                                                      QFileDialog::ShowDirsOnly
+                                                      | QFileDialog::DontResolveSymlinks);
 
       qDebug() << "Usage: " << argv[0] << " imagePath";
-      return 0;
+      w.loadImagePath(dir);
    }
    else
    {
-      w.loadImagePath(argv[1]);
+      if (a.arguments().contains("--help") || a.arguments().contains("--about"))
+      {
+         qDebug() << "Help / About";
+      }
+      else if (a.arguments().contains("--aboutqt"))
+      {
+         qDebug() << "About Qt";
+         QMessageBox::aboutQt(0);
+      }
+      else
+      {
+         // Default behavior
+         w.loadImagePath(argv[1]);
+      }
+
    }
 
    w.show();

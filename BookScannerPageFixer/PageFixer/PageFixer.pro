@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-    PictureView.cpp
+    PictureView.cpp \
+    DocumentWriter.cpp
 
 HEADERS  += MainWindow.h \
-    PictureView.h
+    PictureView.h \
+    DocumentWriter.h
 
 FORMS    += MainWindow.ui

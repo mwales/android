@@ -211,7 +211,7 @@
             <item>
              <widget class="QLabel" name="theImagesProcessedLabel">
               <property name="text">
-               <string>( xx / xx )</string>
+               <string>Idle</string>
               </property>
              </widget>
             </item>

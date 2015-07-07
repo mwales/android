@@ -38,11 +38,19 @@ private slots:
 
    void movePageSelectionDown();
 
-   void pageSelectionListChanged();
+   void isImageProcessingAllowed();
 
    void nextImage();
 
    void previousImage();
+
+   void processImages();
+
+   void imageProcessingComplete();
+
+   void imageProcessingError(QString reason);
+
+   void imageProcessingStatus(int complete, int total);
 
 private:
 
@@ -52,6 +60,9 @@ private:
     * @return User facing string representing the two QPoints
     */
    QString pagePointsToString(PagePoints pp);
+
+   /// Updates the picture with whatever picture is indicated by theCurImageIndex
+   void updatePicture();
 
    /// This list of points should exactly match the list that the user sees
    QList<PagePoints> thePagePointsList;
@@ -66,8 +77,13 @@ private:
    /// The images in the current folder
    QStringList theImageFiles;
 
+   QString theImagePath;
+
    /// The current visible image
    int theCurImageIndex;
+
+   /// True when images are being process (don't enable the process image button)
+   bool theProcessingInProgressFlag;
 };
 
 #endif // MAINWINDOW_H
