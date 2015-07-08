@@ -4,6 +4,9 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QThreadPool>
+#include <QInputDialog>
+#include <QFileDialog>
+#include <QRegExp>
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -229,13 +232,68 @@ void MainWindow::processImages()
 {
    qDebug() << __PRETTY_FUNCTION__;
 
+   if (theImageFiles.empty())
+   {
+      QMessageBox::critical(this, "No images", "No images were found");
+      return;
+   }
+
+   // Use the first file image name as a template for the new filename prefix
+   QString defaultPrefix = "Cropped-";
+   QRegExp regEx("^\\D*");
+   int matchPos = regEx.indexIn(theImageFiles.first());
+   if (matchPos != -1)
+   {
+      //defaultPrefix = theImageFiles.first().mid(matchPos,regEx.matchedLength());
+      defaultPrefix = regEx.cap() + "-crop-";
+      qDebug() << "Default Prefix: " << defaultPrefix;
+   }
+   else
+   {
+      qDebug() << "Default Prefix: " << defaultPrefix << " (hardcoded default)";
+   }
+
+   // Determine the prefix for the new image files
+   bool userOk;
+   QString prefix = QInputDialog::getText(this,
+                                          "Image Prefix",
+                                          "Enter the prefix for the cropped images",
+                                          QLineEdit::Normal,
+                                          defaultPrefix,
+                                          &userOk);
+
+   if (!userOk || ( prefix == ""))
+   {
+      qDebug() << "User aborted";
+      return;
+   }
+
+   qDebug() << "User chosen prefix = " << prefix;
+
+   // Have the user choose an output directory
+   QString outputDir = QFileDialog::getExistingDirectory(this,
+                                                         "Choose output directory",
+                                                         "Choose directory to write output files");
+
+   if (outputDir.isEmpty())
+   {
+      QMessageBox::critical(this, "Error", "No directory chosen to process images");
+      return;
+   }
+
+   qDebug() << "User chosen output directory = " << outputDir;
+
    theProcessingInProgressFlag = true;
    isImageProcessingAllowed();
 
    ui->theImagesProcessedLabel->setText("Start");
    ui->theImagesProcessedPb->setValue(0);
 
+   // Setup the document writer with the data it needs for processing
    DocumentWriter* dw = new DocumentWriter();
+   dw->setOutputInfo(outputDir, prefix);
+   dw->setImageData(theImagePath, theImageFiles);
+   dw->setSelectionInfo(thePagePointsList);
 
    // Connect callbacks
    connect(dw, SIGNAL(JobSuccessful()),
@@ -259,8 +317,6 @@ void MainWindow::imageProcessingComplete()
    theProcessingInProgressFlag = false;
    isImageProcessingAllowed();
 }
-
-
 
 void MainWindow::imageProcessingError(QString reason)
 {

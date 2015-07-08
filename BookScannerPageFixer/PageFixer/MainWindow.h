@@ -8,8 +8,7 @@
 #include <QList>
 #include <QPair>
 #include <QPoint>
-
-typedef QPair<QPoint, QPoint> PagePoints;
+#include "Common.h"
 
 namespace Ui {
 class MainWindow;

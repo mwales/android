@@ -19,6 +19,7 @@ SOURCES += main.cpp\
 
 HEADERS  += MainWindow.h \
     PictureView.h \
-    DocumentWriter.h
+    DocumentWriter.h \
+    Common.h
 
 FORMS    += MainWindow.ui
