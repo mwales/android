@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QPixmap>
 #include "DocumentWriter.h"
 
 DocumentWriter::DocumentWriter(QObject *parent) :
@@ -26,6 +27,25 @@ void DocumentWriter::run()
          QString suffix = QFileInfo(curImage).completeSuffix();
          QString fullPath = theOutputDirectory + QDir::separator() + theOutputPrefix + filenameCounter + "." + suffix;
          QString finalPath = QFileInfo(fullPath).absoluteFilePath();
+
+         int width = qAbs(curPP.first.x() - curPP.second.x());
+         int height = qAbs(curPP.first.y() - curPP.second.y());
+
+         int xVal = curPP.first.x() < curPP.second.x() ? curPP.first.x() : curPP.second.x();
+         int yVal = curPP.first.y() < curPP.second.y() ? curPP.first.y() : curPP.second.y();
+
+         QString sourcePath = QFileInfo(theImagesPath + QDir::separator() + curImage).absoluteFilePath();
+
+         QPixmap sourceImage(sourcePath);
+
+         QPixmap croppedImage = sourceImage.copy(xVal, yVal, width, height);
+
+         if (!croppedImage.save(finalPath))
+         {
+            // Save failed
+            emit JobFailed(QString("Failed to save %1").arg(finalPath));
+            return;
+         }
 
          qDebug() << "Final Path=" << finalPath;
          pageCounter++;
