@@ -10,10 +10,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.app.Activity;
+
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -120,7 +123,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         mCameraPreviewSH = mFragment.getSurfaceHolder();
         mCameraPreviewSH.addCallback(this);
 
-
+        // Setup camera orientation
+        setCameraDisplayOrientation();
     }
 
 
@@ -248,4 +252,34 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
     {
         Log.d(TAG, "Image capture started");
     }
+
+    /**
+     * This method shamelessly stolen from Android documentation
+     */
+    public void setCameraDisplayOrientation()
+    {
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(mBackfacingCameraId, info);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation)
+        {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
+        {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        }
+        else
+        {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        mCamera.setDisplayOrientation(result);
+     }
 }

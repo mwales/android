@@ -32,3 +32,8 @@ proguard/
 .idea/tasks.xml
 .idea/datasources.xml
 .idea/dataSources.ids
+
+# Qt project stuff to ignmore
+*.pro.user
+build-*-Debug
+        
