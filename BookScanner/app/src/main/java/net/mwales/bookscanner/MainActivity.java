@@ -1,7 +1,11 @@
 package net.mwales.bookscanner;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.preference.PreferenceManager;
+import android.preference.Preference;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
@@ -180,6 +184,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
         {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
             return true;
         }
 
@@ -244,7 +250,24 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         // Ready the camera to take another picture
         mCamera.startPreview();
 
-        PhotoTransport pt = new PhotoTransport("Duke", 9876, data);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String serverAddress = sp.getString("server_address", "192.168.1.100");
+
+        // Parse the port number from the preferences string
+        String serverPortStr = sp.getString("server_port_number", "5975");
+        int serverPort = 5975;
+        try
+        {
+            serverPort = Integer.parseInt(serverPortStr);
+        }
+        catch(NumberFormatException e)
+        {
+            Log.e(TAG, "Error parsing the server port: " + serverPortStr);
+        }
+
+        Log.d(TAG, "Settings retrieved: ServerAddr=" + serverAddress + " and ServerPort=" + serverPort);
+
+        PhotoTransport pt = new PhotoTransport(serverAddress, serverPort, data);
     }
 
     @Override
