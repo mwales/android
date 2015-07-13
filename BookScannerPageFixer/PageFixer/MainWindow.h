@@ -51,6 +51,12 @@ private slots:
 
    void imageProcessingStatus(int complete, int total);
 
+   void showAboutDialog();
+
+   void showAboutQtDialog();
+
+   void startServerDialog();
+
 private:
 
    /**

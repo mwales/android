@@ -2,6 +2,10 @@
 #define SERVERCONTROLDIALOG_H
 
 #include <QDialog>
+#include <QTcpServer>
+#include <QThread>
+#include <QList>
+#include "ImageTransfer.h"
 
 namespace Ui {
 class ServerControlDialog;
@@ -15,8 +19,37 @@ public:
    explicit ServerControlDialog(QWidget *parent = 0);
    ~ServerControlDialog();
 
+private slots:
+
+   void chooseDirectory();
+
+   void close();
+
+   void stopServer();
+
+   void startServer();
+
+   void newConnection();
+
+   void serverError(QAbstractSocket::SocketError err);
+
+   void jobImageSize(int size);
+
+   void jobTransferComplete();
+
+   void jobError(QString message);
+
+
 private:
    Ui::ServerControlDialog *ui;
+
+   QTcpServer theServerSocket;
+
+   int thePortNumber;
+
+   QThread* theServerThread;
+
+   QList<ImageTransfer*> theTransferJobs;
 };
 
 #endif // SERVERCONTROLDIALOG_H

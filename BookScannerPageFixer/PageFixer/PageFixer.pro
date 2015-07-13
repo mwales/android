@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,11 +15,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         MainWindow.cpp \
     PictureView.cpp \
-    DocumentWriter.cpp
+    DocumentWriter.cpp \
+    ServerControlDialog.cpp \
+    ImageTransfer.cpp
 
 HEADERS  += MainWindow.h \
     PictureView.h \
     DocumentWriter.h \
-    Common.h
+    Common.h \
+    ServerControlDialog.h \
+    ImageTransfer.h
 
-FORMS    += MainWindow.ui
+FORMS    += MainWindow.ui \
+    ServerControlDialog.ui

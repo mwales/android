@@ -11,6 +11,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "DocumentWriter.h"
+#include "ServerControlDialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
    QMainWindow(parent),
@@ -52,6 +53,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
    connect(ui->theProcessImagesButton, SIGNAL(clicked()),
            this, SLOT(processImages()));
+
+   // Connect menu buttons
+   connect(ui->actionAbout, SIGNAL(triggered()),
+           this, SLOT(showAboutDialog()));
+   connect(ui->actionAbout_Qt, SIGNAL(triggered()),
+           this, SLOT(showAboutQtDialog()));
+   connect(ui->actionStart_Server, SIGNAL(triggered()),
+           this, SLOT(startServerDialog()));
 
    updateStatusBar(ui->thePic->dragMode());
 }
@@ -342,3 +351,18 @@ void MainWindow::imageProcessingStatus(int complete, int total)
    ui->theImagesProcessedPb->setValue(complete);
 }
 
+void MainWindow::showAboutDialog()
+{
+   QMessageBox::about(this, "About Book Scanner", "Book Scanner <hr /> <hr /> Application also available on Android");
+}
+
+void MainWindow::showAboutQtDialog()
+{
+   QMessageBox::aboutQt(this);
+}
+
+void MainWindow::startServerDialog()
+{
+   ServerControlDialog* scd = new ServerControlDialog(this);
+   scd->show();
+}
