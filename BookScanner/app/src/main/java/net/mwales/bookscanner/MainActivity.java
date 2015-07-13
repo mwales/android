@@ -20,6 +20,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.app.Activity;
+import android.widget.Toast;
 
 
 import java.text.DecimalFormat;
@@ -226,7 +227,26 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
     {
         Log.d(TAG, "Shutter pressed");
 
-        mCamera.takePicture(this, null, this);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean alwaysAutofocus = sp.getBoolean("always_autofocus", false);
+
+        Log.d(TAG, "Always Autofocus Setting=" + alwaysAutofocus);
+
+        if (alwaysAutofocus)
+        {
+            AutoFocus();
+        }
+
+        try
+        {
+            mCamera.takePicture(this, null, this);
+        }
+        catch(Exception e)
+        {
+            Log.d(TAG, "Exception during picture: " + e.getMessage());
+            Toast toast = Toast.makeText(this, "Error taking picture: " + e.getMessage(), Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     @Override
