@@ -14,11 +14,11 @@ public:
 
 signals:
 
-   void imageSize(int size);
+   void imageSize(QString filename, int size);
 
-   void transferComplete();
+   void transferComplete(QString filename);
 
-   void error(QString message);
+   void error(QString filename, QString message);
 
 protected slots:
 
@@ -28,9 +28,11 @@ protected slots:
 
    void disconnected();
 
-   void error(QAbstractSocket::SocketError socketError);
+   void socketError(QAbstractSocket::SocketError socketError);
 
 protected:
+
+   void closeAndDelete();
 
    QString theDataPath;
 

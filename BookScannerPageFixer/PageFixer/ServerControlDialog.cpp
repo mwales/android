@@ -122,19 +122,24 @@ void ServerControlDialog::newConnection()
    while(theServerSocket.hasPendingConnections())
    {
       ui->theList->addItem("New Connection Received");
+      ui->theList->scrollToBottom();
 
-      QString filename = QString("%1%2.jpg").arg(ui->theFilename->text()).arg(ui->theFilenameSuffix->text());
+      QString imageNumString = QString("0000%1").arg(ui->theFilenameSuffix->text()).right(4);
+
+      QString filename = QString("%1%2.jpg").arg(ui->theFilename->text()).arg(imageNumString);
 
       ImageTransfer* imageJob = new ImageTransfer(ui->theDirectory->text(), filename, theServerSocket.nextPendingConnection(), theServerThread );
 
-      connect(imageJob, SIGNAL(imageSize(int)),
-              this, SLOT(jobImageSize(int)));
-      connect(imageJob, SIGNAL(transferComplete()),
-              this, SLOT(jobTransferComplete()));
-      connect(imageJob, SIGNAL(error(QString)),
-              this, SLOT(jobError(QString)));
+      connect(imageJob, SIGNAL(imageSize(QString, int)),
+              this, SLOT(jobImageSize(QString, int)));
+      connect(imageJob, SIGNAL(transferComplete(QString)),
+              this, SLOT(jobTransferComplete(QString)));
+      connect(imageJob, SIGNAL(error(QString, QString)),
+              this, SLOT(jobError(QString, QString)));
 
       theTransferJobs.append(imageJob);
+
+      ui->theFilenameSuffix->setValue( ui->theFilenameSuffix->value() + 1);
 
    }
 }
@@ -159,17 +164,23 @@ void ServerControlDialog::serverError(QAbstractSocket::SocketError err)
 }
 
 
-void ServerControlDialog::jobImageSize(int size)
+void ServerControlDialog::jobImageSize(QString filename, int size)
 {
-qDebug() << __PRETTY_FUNCTION__;
+   qDebug() << __PRETTY_FUNCTION__;
+   ui->theList->addItem(QString("Start receiving %1 (%2 bytes)").arg(filename).arg(size));
+   ui->theList->scrollToBottom();
 }
 
-void ServerControlDialog::jobTransferComplete()
+void ServerControlDialog::jobTransferComplete(QString filename)
 {
-qDebug() << __PRETTY_FUNCTION__;
+   qDebug() << __PRETTY_FUNCTION__;
+   ui->theList->addItem(QString("Finished receiving %1").arg(filename));
+   ui->theList->scrollToBottom();
 }
 
-void ServerControlDialog::jobError(QString message)
+void ServerControlDialog::jobError(QString filename, QString message)
 {
-qDebug() << __PRETTY_FUNCTION__;
+   ui->theList->addItem(QString("Error receiving %1 (%2)").arg(filename).arg(message));
+   ui->theList->scrollToBottom();
+   qDebug() << __PRETTY_FUNCTION__;
 }

@@ -1,5 +1,8 @@
 #include "ImageTransfer.h"
 #include <QtDebug>
+#include <QtEndian>
+#include <QFile>
+#include <QDir>
 
 ImageTransfer::ImageTransfer(QString path, QString filename, QTcpSocket* dataDevice, QObject *parent) :
    QObject(parent),
@@ -16,37 +19,25 @@ ImageTransfer::ImageTransfer(QString path, QString filename, QTcpSocket* dataDev
    connect(dataDevice, SIGNAL(readyRead()),
            this, SLOT(readyRead()));
    connect(dataDevice, SIGNAL(error(QAbstractSocket::SocketError)),
-           this, SLOT(error(QAbstractSocket::SocketError)));
+           this, SLOT(socketError(QAbstractSocket::SocketError)));
 
 }
 
 void ImageTransfer::readyRead()
 {
-   qDebug() << __PRETTY_FUNCTION__ << "size" << theDataStream->bytesAvailable();
+   //qDebug() << __PRETTY_FUNCTION__ << "size" << theDataStream->bytesAvailable();
 
    if ( (theImageSize == 0) && (theDataStream->bytesAvailable() >= sizeof(quint32)) )
    {
       // Read the image size
       theDataStream->read((char*) &theImageSize, sizeof(quint32));
 
+      // Convert from network order to big endian
+      theImageSize = qFromBigEndian(theImageSize);
+
       qDebug() << "Image Size" << theImageSize;
-      /*
-      qDebug() << "Image Size parsed" << imageS
 
-      bool success;
-      int sizeParsed = imageSizeData.toInt(&success);
-      qDebug() << "Image Size Data" << imageSizeData.toHex();
-
-      if (success)
-      {
-         qDebug() << "Image Size of" << theFilename << "is" << sizeParsed;
-         theImageSize = sizeParsed;
-         emit imageSize(theImageSize);
-      }
-      else
-      {
-         qDebug() << "Failed to read image size";
-      }*/
+      emit imageSize(theFilename, theImageSize);
    }
    else
    {
@@ -54,7 +45,56 @@ void ImageTransfer::readyRead()
       // payload data
       theImageData.append(theDataStream->readAll());
 
-      qDebug() << "Data recevied so far = " << theImageData.size();
+      //qDebug() << "Data recevied so far = " << theImageData.size();
+
+      if (theImageData.size() == theImageSize)
+      {
+         qDebug() << "Image Complete!";
+
+         // Now open the file to store the image
+         QString absFilename = QString("%1%2%3").arg(theDataPath).arg(QDir::separator()).arg(theFilename);
+         absFilename = QDir::cleanPath(absFilename);
+         QFile destinationFile(absFilename);
+
+         if (!destinationFile.open(QIODevice::WriteOnly))
+         {
+            // Fail to open the file
+
+            QString msg = QString("Failed to open the file: %1").arg(destinationFile.errorString());
+            qDebug() << msg;
+            emit error(theFilename, msg);
+
+            closeAndDelete();
+         }
+
+         // Write the image data to the file
+         int numBytesWritten = destinationFile.write(theImageData);
+
+         if (numBytesWritten != theImageSize)
+         {
+            qDebug() << "Failed to write the full image to the file";
+
+            QString msg = QString("Failed to write file %1.  Wrote %2 out of %3 bytes")
+                          .arg(theFilename).arg(numBytesWritten).arg(theImageSize);
+
+            qDebug() << msg;
+            emit error(theFilename, msg);
+
+            // Quit processing
+            closeAndDelete();
+         }
+         else
+         {
+            qDebug() << "Successfully wrote: " << absFilename;
+            emit transferComplete(theFilename);
+
+            closeAndDelete();
+         }
+
+
+      }
+
+
    }
 }
 
@@ -68,8 +108,14 @@ void ImageTransfer::disconnected()
    qDebug() << __PRETTY_FUNCTION__;
 }
 
-void ImageTransfer::error(QAbstractSocket::SocketError socketError)
+void ImageTransfer::socketError(QAbstractSocket::SocketError socketError)
 {
    qDebug() << __PRETTY_FUNCTION__;
+}
+
+void ImageTransfer::closeAndDelete()
+{
+   theDataStream->close();
+   deleteLater();
 }
 

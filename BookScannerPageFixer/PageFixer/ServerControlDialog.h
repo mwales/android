@@ -33,11 +33,11 @@ private slots:
 
    void serverError(QAbstractSocket::SocketError err);
 
-   void jobImageSize(int size);
+   void jobImageSize(QString filename, int size);
 
-   void jobTransferComplete();
+   void jobTransferComplete(QString filename);
 
-   void jobError(QString message);
+   void jobError(QString filename, QString message);
 
 
 private:
