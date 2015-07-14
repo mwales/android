@@ -37,7 +37,7 @@ void ImageTransfer::readyRead()
 
       qDebug() << "Image Size" << theImageSize;
 
-      emit imageSize(theFilename, theImageSize);
+      emit imageSize(fullImagePath(), theImageSize);
    }
    else
    {
@@ -62,7 +62,7 @@ void ImageTransfer::readyRead()
 
             QString msg = QString("Failed to open the file: %1").arg(destinationFile.errorString());
             qDebug() << msg;
-            emit error(theFilename, msg);
+            emit error(fullImagePath(), msg);
 
             closeAndDelete();
          }
@@ -86,7 +86,7 @@ void ImageTransfer::readyRead()
          else
          {
             qDebug() << "Successfully wrote: " << absFilename;
-            emit transferComplete(theFilename);
+            emit transferComplete(fullImagePath());
 
             closeAndDelete();
          }
@@ -117,5 +117,10 @@ void ImageTransfer::closeAndDelete()
 {
    theDataStream->close();
    deleteLater();
+}
+
+QString ImageTransfer::fullImagePath()
+{
+   return QDir::cleanPath(theDataPath + QDir::separator() + theFilename);
 }
 

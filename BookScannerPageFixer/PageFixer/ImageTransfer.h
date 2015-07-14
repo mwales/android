@@ -34,6 +34,8 @@ protected:
 
    void closeAndDelete();
 
+   QString fullImagePath();
+
    QString theDataPath;
 
    QString theFilename;

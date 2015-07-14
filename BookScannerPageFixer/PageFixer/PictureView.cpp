@@ -97,3 +97,8 @@ void PictureView::toggleDragMode()
    emit scrollModeChanged(theCurrentDragMode);
 
 }
+
+void PictureView::autoFit()
+{
+   fitInView(theGs->sceneRect(), Qt::KeepAspectRatio);
+}

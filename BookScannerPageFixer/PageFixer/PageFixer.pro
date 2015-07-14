@@ -17,14 +17,17 @@ SOURCES += main.cpp\
     PictureView.cpp \
     DocumentWriter.cpp \
     ServerControlDialog.cpp \
-    ImageTransfer.cpp
+    ImageTransfer.cpp \
+    PictureDialog.cpp
 
 HEADERS  += MainWindow.h \
     PictureView.h \
     DocumentWriter.h \
     Common.h \
     ServerControlDialog.h \
-    ImageTransfer.h
+    ImageTransfer.h \
+    PictureDialog.h
 
 FORMS    += MainWindow.ui \
-    ServerControlDialog.ui
+    ServerControlDialog.ui \
+    PictureDialog.ui

@@ -18,6 +18,9 @@ public:
 
    void toggleDragMode();
 
+   void autoFit();
+
+
 signals:
 
    void scrollModeChanged(QGraphicsView::DragMode dm);
