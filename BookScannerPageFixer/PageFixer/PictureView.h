@@ -18,8 +18,8 @@ public:
 
    void toggleDragMode();
 
+   /// This will make the image fit the widget (until user zooms with mouse wheel)
    void autoFit();
-
 
 signals:
 
@@ -35,6 +35,8 @@ protected:
 
    virtual void mouseReleaseEvent(QMouseEvent * event);
 
+   virtual void resizeEvent(QResizeEvent * event);
+
 private:
 
    QPoint theRectStart;
@@ -43,7 +45,7 @@ private:
 
    QGraphicsScene* theGs;
 
-   double theScale;
+   bool theAutofitFlag;
 };
 
 #endif // PICTUREVIEW_H

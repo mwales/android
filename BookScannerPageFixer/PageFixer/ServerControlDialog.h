@@ -5,6 +5,8 @@
 #include <QTcpServer>
 #include <QThread>
 #include <QList>
+#include <QMap>
+#include <QListWidgetItem>
 #include "ImageTransfer.h"
 
 namespace Ui {
@@ -21,6 +23,7 @@ public:
 
 private slots:
 
+   // UI handlers
    void chooseDirectory();
 
    void close();
@@ -29,15 +32,21 @@ private slots:
 
    void startServer();
 
+   void displayImage(QListWidgetItem * item);
+
+   // Server socket related signals/slots
    void newConnection();
 
    void serverError(QAbstractSocket::SocketError err);
 
-   void jobImageSize(QString filename, int size);
+   // Signals associated with the ImageTransfer class
+   void jobImageSize(QString filepath, int size);
 
-   void jobTransferComplete(QString filename);
+   void jobTransferComplete(QString filepath);
 
-   void jobError(QString filename, QString message);
+   void jobError(QString filepath, QString message);
+
+
 
 
 private:
@@ -50,6 +59,12 @@ private:
    QThread* theServerThread;
 
    QList<ImageTransfer*> theTransferJobs;
+
+   /**
+    * The keys are the line numbers in the UI list.  The string is the picture that is associated with that line
+    * number.  Not all line numbers have pictures.
+    */
+   QMap<int, QString> theListFiles;
 };
 
 #endif // SERVERCONTROLDIALOG_H

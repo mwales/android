@@ -6,9 +6,12 @@
 #include <QTcpSocket>
 #include <QNetworkInterface>
 #include <QMessageBox>
+#include <QStackedLayout>
 
 #include "ServerControlDialog.h"
 #include "ui_ServerControlDialog.h"
+#include "PictureView.h"
+#include "PictureDialog.h"
 
 ServerControlDialog::ServerControlDialog(QWidget *parent) :
    QDialog(parent),
@@ -24,6 +27,8 @@ ServerControlDialog::ServerControlDialog(QWidget *parent) :
            this, SLOT(startServer()));
    connect(ui->theStopServerButton, SIGNAL(clicked()),
            this, SLOT(stopServer()));
+   connect(ui->theList, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+           this, SLOT(displayImage(QListWidgetItem*)));
 
    // Setup server socket connections
    connect(&theServerSocket, SIGNAL(newConnection()),
@@ -164,23 +169,52 @@ void ServerControlDialog::serverError(QAbstractSocket::SocketError err)
 }
 
 
-void ServerControlDialog::jobImageSize(QString filename, int size)
+void ServerControlDialog::jobImageSize(QString filepath, int size)
 {
    qDebug() << __PRETTY_FUNCTION__;
+
+   QFileInfo fi(filepath);
+   QString filename = fi.fileName();
+
    ui->theList->addItem(QString("Start receiving %1 (%2 bytes)").arg(filename).arg(size));
    ui->theList->scrollToBottom();
+
+   theListFiles.insert(ui->theList->count() - 1, filepath);
 }
 
-void ServerControlDialog::jobTransferComplete(QString filename)
+void ServerControlDialog::jobTransferComplete(QString filepath)
 {
    qDebug() << __PRETTY_FUNCTION__;
+
+   QFileInfo fi(filepath);
+   QString filename = fi.fileName();
+
    ui->theList->addItem(QString("Finished receiving %1").arg(filename));
    ui->theList->scrollToBottom();
+
+   theListFiles.insert(ui->theList->count() - 1, filepath);
 }
 
-void ServerControlDialog::jobError(QString filename, QString message)
+void ServerControlDialog::jobError(QString filepath, QString message)
 {
+   QFileInfo fi(filepath);
+   QString filename = fi.fileName();
+
    ui->theList->addItem(QString("Error receiving %1 (%2)").arg(filename).arg(message));
    ui->theList->scrollToBottom();
    qDebug() << __PRETTY_FUNCTION__;
+}
+
+void ServerControlDialog::displayImage(QListWidgetItem * item)
+{
+   int row = ui->theList->row(item);
+
+   qDebug() << "User double clicked on row" << row << "which is for" << theListFiles[row];
+
+   if (!theListFiles[row].isEmpty())
+   {
+      PictureDialog* pd = new PictureDialog(theListFiles[row], this);
+      pd->show();
+   }
+
 }

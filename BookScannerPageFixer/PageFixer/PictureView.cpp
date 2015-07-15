@@ -5,7 +5,7 @@
 PictureView::PictureView(QWidget* parent):
    QGraphicsView(parent),
    theCurrentDragMode(QGraphicsView::RubberBandDrag),
-   theScale(1.0)
+   theAutofitFlag(false)
 {
    theGs = new QGraphicsScene();
 }
@@ -29,21 +29,21 @@ void PictureView::setPicture(QString filename)
 
 void PictureView::wheelEvent(QWheelEvent* ev)
 {
-//   qDebug() << __PRETTY_FUNCTION__ << ": ev deltaAngle" << ev->angleDelta().rx() << ", " << ev->angleDelta().ry()
-//               << " and " << ev->angleDelta().x() << ", " << ev->angleDelta().y();
+   theAutofitFlag = false;
 
+   double scaleFactor;
    if (ev->angleDelta().ry() < 0)
    {
       qDebug() << "Zoom out";
-      theScale = /*theScale */ 0.9;
+      scaleFactor = 0.9;
    }
    else
    {
       qDebug() << "Zoom in";
-      theScale = /*theScale */ 1.2;
+      scaleFactor =  1.2;
    }
 
-   scale(theScale, theScale);
+   scale(scaleFactor, scaleFactor);
 }
 
 void PictureView::mousePressEvent(QMouseEvent * event)
@@ -100,5 +100,15 @@ void PictureView::toggleDragMode()
 
 void PictureView::autoFit()
 {
-   fitInView(theGs->sceneRect(), Qt::KeepAspectRatio);
+   theAutofitFlag = true;
+}
+
+void PictureView::resizeEvent(QResizeEvent * event)
+{
+   QGraphicsView::resizeEvent(event);
+
+   if (theAutofitFlag)
+   {
+      fitInView(scene()->sceneRect(), Qt::KeepAspectRatio);
+   }
 }
