@@ -16,14 +16,7 @@ int main(int argc, char *argv[])
 
    if (argc == 1)
    {
-      /// @todo  Open a dialog to let user choose file path
-      QString dir = QFileDialog::getExistingDirectory(0, "Open Directory",
-                                                      "/home",
-                                                      QFileDialog::ShowDirsOnly
-                                                      | QFileDialog::DontResolveSymlinks);
-
-      qDebug() << "Usage: " << argv[0] << " imagePath";
-      w.loadImagePath(dir);
+      w.openDirectoryChooser();
    }
    else
    {

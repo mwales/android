@@ -61,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
            this, SLOT(showAboutQtDialog()));
    connect(ui->actionStart_Server, SIGNAL(triggered()),
            this, SLOT(startServerDialog()));
+   connect(ui->actionOpen_Directory, SIGNAL(triggered()),
+           this, SLOT(openDirectoryChooser()));
 
    updateStatusBar(ui->thePic->dragMode());
 }
@@ -160,7 +162,13 @@ QString MainWindow::pagePointsToString(PagePoints pp)
 
 void MainWindow::loadImagePath(QString imagePath)
 {
-   theImagePath = imagePath;
+   if (imagePath.isEmpty())
+   {
+       qDebug() << __PRETTY_FUNCTION__ << "called with an empty string directory";
+       return;
+   }
+
+    theImagePath = imagePath;
 
    QStringList filters;
    filters << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp" << "*.ppm" << "*.xbm" << "*.xpm";
@@ -230,6 +238,12 @@ void MainWindow::previousImage()
 
 void MainWindow::updatePicture()
 {
+   if (theImageFiles.empty())
+   {
+      qDebug() << "No images";
+      return;
+   }
+
    QString picturePath = theImagePath + QDir::separator() + theImageFiles[theCurImageIndex];
 
    ui->thePic->setPicture(QDir::cleanPath(picturePath));
@@ -365,4 +379,14 @@ void MainWindow::startServerDialog()
 {
    ServerControlDialog* scd = new ServerControlDialog(this);
    scd->show();
+}
+
+void MainWindow::openDirectoryChooser()
+{
+    QString dir = QFileDialog::getExistingDirectory(0, "Open Directory",
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
+    loadImagePath(dir);
 }

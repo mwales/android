@@ -25,6 +25,10 @@ public:
 
    ~MainWindow();
 
+public slots:
+
+   void openDirectoryChooser();
+
 private slots:
 
    void updateStatusBar(QGraphicsView::DragMode dm);

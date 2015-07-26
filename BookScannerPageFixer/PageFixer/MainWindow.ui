@@ -313,7 +313,7 @@
      <x>0</x>
      <y>0</y>
      <width>923</width>
-     <height>23</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuServer">
@@ -321,6 +321,7 @@
      <string>Server</string>
     </property>
     <addaction name="actionStart_Server"/>
+    <addaction name="actionOpen_Directory"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -346,6 +347,11 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Directory">
+   <property name="text">
+    <string>Open Directory...</string>
    </property>
   </action>
  </widget>
