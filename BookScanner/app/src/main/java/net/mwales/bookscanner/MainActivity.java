@@ -349,18 +349,21 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
 
         WifiInfo wi = wm.getConnectionInfo();
 
-        if (wi.getSupplicantState() != SupplicantState.COMPLETED)
+        String quadDot;
+
+        if ( (wi.getSupplicantState() != SupplicantState.COMPLETED) ||
+             (wi.getIpAddress() == 0) )
         {
             // Wifi not up
             Log.d(TAG, "Wifi not connected");
-
+            quadDot = getString(R.string.wifi_unavailable);
         }
         else
         {
-            Log.d(TAG, "IP Address =" + wi.getIpAddress());
-
             int ipAddress = wi.getIpAddress();
-            String quadDot = Integer.toString(0xff & ipAddress) + ".";
+            Log.d(TAG, "IP Address =" + ipAddress);
+
+            quadDot = Integer.toString(0xff & ipAddress) + ".";
 
             ipAddress = ipAddress >> 8;
             quadDot = quadDot + Integer.toString(0xff & ipAddress) + ".";
@@ -370,12 +373,12 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
 
             ipAddress = ipAddress >> 8;
             quadDot = quadDot + Integer.toString(0xff & ipAddress);
-
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            String shutterPort = sp.getString("shutter_port_number", "-1");
-
-            mFragment.setIpInfo(quadDot, shutterPort);
         }
-        Log.d(TAG, "Info=" + wi.toString());
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String shutterPort = sp.getString("shutter_port_number", "-1");
+
+        mFragment.setIpInfo(quadDot, shutterPort);
+
     }
 }
