@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * Created by mwales on 6/14/15.
@@ -25,6 +26,8 @@ public class CamPreviewFragment extends Fragment
     private SurfaceHolder mCamSurface;
 
     private ICaptureCallback mShutterCallback;
+
+    private TextView mIpInfoView;
 
     public CamPreviewFragment()
     {
@@ -89,6 +92,12 @@ public class CamPreviewFragment extends Fragment
             }
         });
 
+        mIpInfoView = (TextView) rootView.findViewById(R.id.ip_address_view);
+        if (mIpInfoView == null)
+        {
+            Log.e(TAG, "Couldn't find the IP Address View");
+        }
+
         return rootView;
     }
 
@@ -100,5 +109,18 @@ public class CamPreviewFragment extends Fragment
     public void registerCaptureListener(ICaptureCallback cb)
     {
         mShutterCallback = cb;
+    }
+
+    public void setIpInfo(String ipAddress, String portNumber)
+    {
+        if (mIpInfoView == null)
+        {
+            Log.d(TAG, "No IP Address view");
+            return;
+        }
+
+        mIpInfoView.setText(getActivity().getString(R.string.ip_address) + ipAddress +
+                            getActivity().getString(R.string.port_number) + portNumber);
+
     }
 }

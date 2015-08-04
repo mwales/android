@@ -2,4 +2,6 @@
     <string name="app_name">Book Scanner</string>
     <string name="action_settings">Settings</string>
     <string name="capture_button">Capture Page</string>
+    <string name="ip_address">IP Addr: </string>
+    <string name="port_number">,   Port:</string>
 </resources>

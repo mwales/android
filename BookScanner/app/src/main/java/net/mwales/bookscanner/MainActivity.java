@@ -1,9 +1,13 @@
 package net.mwales.bookscanner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.preference.Preference;
 import android.support.v4.app.FragmentTransaction;
@@ -20,6 +24,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.app.Activity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -35,6 +40,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
     SurfaceHolder mCameraPreviewSH;
     CamPreviewFragment mFragment;
     int mBackfacingCameraId = -1;
+
+    int mShutterPort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -130,6 +137,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
 
         // Setup camera orientation
         setCameraDisplayOrientation();
+
+        displayNetworkInformation();
     }
 
 
@@ -325,4 +334,48 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         }
         mCamera.setDisplayOrientation(result);
      }
+
+    protected void displayNetworkInformation()
+    {
+        Log.d(TAG, "DisplayNetworkInformation started");
+
+        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        if (wm == null)
+        {
+            Log.e(TAG, "Couldn't access the Wifi Manager");
+            return;
+        }
+
+        WifiInfo wi = wm.getConnectionInfo();
+
+        if (wi.getSupplicantState() != SupplicantState.COMPLETED)
+        {
+            // Wifi not up
+            Log.d(TAG, "Wifi not connected");
+
+        }
+        else
+        {
+            Log.d(TAG, "IP Address =" + wi.getIpAddress());
+
+            int ipAddress = wi.getIpAddress();
+            String quadDot = Integer.toString(0xff & ipAddress) + ".";
+
+            ipAddress = ipAddress >> 8;
+            quadDot = quadDot + Integer.toString(0xff & ipAddress) + ".";
+
+            ipAddress = ipAddress >> 8;
+            quadDot = quadDot + Integer.toString(0xff & ipAddress) + ".";
+
+            ipAddress = ipAddress >> 8;
+            quadDot = quadDot + Integer.toString(0xff & ipAddress);
+
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            String shutterPort = sp.getString("shutter_port_number", "-1");
+
+            mFragment.setIpInfo(quadDot, shutterPort);
+        }
+        Log.d(TAG, "Info=" + wi.toString());
+    }
 }

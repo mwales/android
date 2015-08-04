@@ -26,6 +26,14 @@
         android:layout_weight="4"
         />
 
+    <TextView
+        android:id="@+id/ip_address_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ip_address"
+        />
+
+
 
 
 </LinearLayout>

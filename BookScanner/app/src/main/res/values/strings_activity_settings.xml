@@ -1,0 +1,18 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <string name="pref_title_always_autofocus">Auto-focus Every Picture</string>
+    <string name="pref_description_always_autofocus">Auto-focus will be activated before each picture</string>
+
+    <string name="server_address_display_name">Book Scanner Server Address</string>
+    <string name="server_address_default_address">192.168.1.100</string>
+
+    <string name="server_port_display_name">Book Scanner Server Port Number</string>
+    <string name="server_port_default_value">5975</string>
+
+    <string name="shutter_port_display_name">Port Number for Remote Shutter App</string>
+    <string name="shutter_port_default_value">5976</string>
+
+</resources>
