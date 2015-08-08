@@ -43,6 +43,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
 
     int mShutterPort;
 
+    ShutterServer mShutterServer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -138,7 +140,22 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         // Setup camera orientation
         setCameraDisplayOrientation();
 
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String shutterPort = sp.getString("shutter_port_number", "-1");
+
+        try
+        {
+            mShutterPort = Integer.parseInt(shutterPort);
+        }
+        catch(NumberFormatException e)
+        {
+            Log.e(TAG, String.format("Error parsing the shutter port number string: %s, exception = %s", shutterPort, e.getMessage()) );
+            mShutterPort = 5976;
+        }
+
         displayNetworkInformation();
+
+        mShutterServer = new ShutterServer(this, mShutterPort);
     }
 
 
@@ -169,6 +186,8 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
     protected void onStop()
     {
         super.onStop();
+
+        mShutterServer.StopServer();
 
         Log.d(TAG, "onStop called - releasing camera");
 
@@ -375,10 +394,7 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
             quadDot = quadDot + Integer.toString(0xff & ipAddress);
         }
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String shutterPort = sp.getString("shutter_port_number", "-1");
-
-        mFragment.setIpInfo(quadDot, shutterPort);
+        mFragment.setIpInfo(quadDot, String.valueOf(mShutterPort));
 
     }
 }
