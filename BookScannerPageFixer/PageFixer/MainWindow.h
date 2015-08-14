@@ -61,6 +61,8 @@ private slots:
 
    void startServerDialog();
 
+   void writePdf();
+
 private:
 
    /**

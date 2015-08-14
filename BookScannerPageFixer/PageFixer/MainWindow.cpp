@@ -10,7 +10,7 @@
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "DocumentWriter.h"
+#include "ImageWriter.h"
 #include "ServerControlDialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
    connect(ui->theProcessImagesButton, SIGNAL(clicked()),
            this, SLOT(processImages()));
+   connect(ui->theWritePdfButton, SIGNAL(clicked()),
+           this, SLOT(writePdf()));
 
    // Connect menu buttons
    connect(ui->actionAbout, SIGNAL(triggered()),
@@ -313,7 +315,7 @@ void MainWindow::processImages()
    ui->theImagesProcessedPb->setValue(0);
 
    // Setup the document writer with the data it needs for processing
-   DocumentWriter* dw = new DocumentWriter();
+   DocumentWriter* dw = new ImageWriter();
    dw->setOutputInfo(outputDir, prefix);
    dw->setImageData(theImagePath, theImageFiles);
    dw->setSelectionInfo(thePagePointsList);
@@ -389,4 +391,9 @@ void MainWindow::openDirectoryChooser()
                                                     | QFileDialog::DontResolveSymlinks);
 
     loadImagePath(dir);
+}
+
+void MainWindow::writePdf()
+{
+
 }

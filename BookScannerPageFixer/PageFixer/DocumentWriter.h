@@ -5,6 +5,8 @@
 #include <QRunnable>
 #include <QList>
 #include <QStringList>
+#include <QPixmap>
+
 #include "Common.h"
 
 class DocumentWriter : public QObject, public QRunnable
@@ -41,6 +43,10 @@ public slots:
 
 protected:
 
+   virtual bool jobInit() { return true; };
+
+   virtual bool processImage(QPixmap const & imageData) = 0;
+
    QString theImagesPath;
 
    QStringList theImageList;
@@ -50,6 +56,10 @@ protected:
    QString theOutputDirectory;
 
    QString theOutputPrefix;
+
+   int thePageCounter;
+
+   QString theCurImage;
 
 };
 

@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     DocumentWriter.cpp \
     ServerControlDialog.cpp \
     ImageTransfer.cpp \
-    PictureDialog.cpp
+    PictureDialog.cpp \
+    PdfWriter.cpp \
+    ImageWriter.cpp
 
 HEADERS  += MainWindow.h \
     PictureView.h \
@@ -26,7 +28,9 @@ HEADERS  += MainWindow.h \
     Common.h \
     ServerControlDialog.h \
     ImageTransfer.h \
-    PictureDialog.h
+    PictureDialog.h \
+    PdfWriter.h \
+    ImageWriter.h
 
 FORMS    += MainWindow.ui \
     ServerControlDialog.ui \
