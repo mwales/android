@@ -1,0 +1,12 @@
+<resources>
+    <string name="title_activity_settings">Remote Configuration</string>
+
+    <!-- Strings related to Settings -->
+
+    <string name="camera_address_display_name">Book Scanner Camera Address</string>
+    <string name="camera_address_default_address">192.168.1.100</string>
+
+    <string name="camera_port_display_name">Book Scanner Camera Port Number</string>
+    <string name="camera_port_default_value">5975</string>
+
+</resources>

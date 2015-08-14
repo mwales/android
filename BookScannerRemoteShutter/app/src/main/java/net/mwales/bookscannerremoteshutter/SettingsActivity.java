@@ -1,4 +1,4 @@
-package net.mwales.bookscanner;
+package net.mwales.bookscannerremoteshutter;
 
 import android.annotation.TargetApi;
 import android.content.Context;

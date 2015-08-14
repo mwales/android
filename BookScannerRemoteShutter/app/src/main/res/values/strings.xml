@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Book Scanner Remote Shutter</string>
+    <string name="capture_button">Capture Photo</string>
+    <string name="focus_button">Focus Camera</string>
+    <string name="scanner_ip">Book Scanner Camera IP: </string>
+    <string name="scanner_port">Book Scanner Camera Port: </string>
+    <string name="action_settings">Settings...</string>
+</resources>
