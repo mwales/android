@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * Created by mwales on 6/16/15.
+ * Sends a string message to a server and then disconnects on a background thread
  */
 public class ShutterTransport
 {

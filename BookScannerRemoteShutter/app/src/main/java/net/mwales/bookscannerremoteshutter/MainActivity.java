@@ -29,8 +29,6 @@ public class MainActivity extends ActionBarActivity
 
     int mBookScannerPort;
 
-    PlaceholderFragment mFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -39,7 +37,7 @@ public class MainActivity extends ActionBarActivity
         if (savedInstanceState == null)
         {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, mFragment = new PlaceholderFragment())
+                    .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
     }
@@ -59,13 +57,14 @@ public class MainActivity extends ActionBarActivity
     {
         super.onStart();
 
-        if (mFragment.getCaptureButton() == null)
+        Button captureButton = (Button) findViewById(R.id.capture_button);
+        if (captureButton == null)
         {
             Log.wtf(TAG, "Start didn't get capture button");
             return;
         }
 
-        mFragment.getCaptureButton().setOnClickListener(new View.OnClickListener()
+        captureButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -74,13 +73,14 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
-        if (mFragment.getFocusButton() == null)
+        Button focusButton = (Button) findViewById(R.id.focus_button);
+        if (focusButton == null)
         {
             Log.wtf(TAG, "Start didn't get focus button");
             return;
         }
 
-        mFragment.getFocusButton().setOnClickListener(new View.OnClickListener()
+        focusButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -176,29 +176,11 @@ public class MainActivity extends ActionBarActivity
         {
         }
 
-        Button mCaptureButton;
-
-        Button mFocusButton;
-
-        public Button getCaptureButton()
-        {
-            return mCaptureButton;
-        }
-
-        public Button getFocusButton()
-        {
-            return mFocusButton;
-        }
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            mCaptureButton = (Button) rootView.findViewById(R.id.capture_button);
-            mFocusButton = (Button) rootView.findViewById(R.id.focus_button);
-
             return rootView;
         }
     }
