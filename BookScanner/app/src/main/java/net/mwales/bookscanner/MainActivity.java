@@ -141,7 +141,7 @@ public class MainActivity extends ActionBarActivity implements SurfaceHolder.Cal
         setCameraDisplayOrientation();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String shutterPort = sp.getString("shutter_port_number", "-1");
+        String shutterPort = sp.getString("shutter_port_number", "5976");
 
         try
         {

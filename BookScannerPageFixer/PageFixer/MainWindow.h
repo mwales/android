@@ -9,6 +9,7 @@
 #include <QPair>
 #include <QPoint>
 #include "Common.h"
+#include "DocumentWriter.h"
 
 namespace Ui {
 class MainWindow;
@@ -48,6 +49,7 @@ private slots:
    void previousImage();
 
    void processImages();
+   void writePdf();
 
    void imageProcessingComplete();
 
@@ -61,7 +63,7 @@ private slots:
 
    void startServerDialog();
 
-   void writePdf();
+
 
 private:
 
@@ -74,6 +76,8 @@ private:
 
    /// Updates the picture with whatever picture is indicated by theCurImageIndex
    void updatePicture();
+
+   void startDocumentWriting(DocumentWriter* dw);
 
    /// This list of points should exactly match the list that the user sees
    QList<PagePoints> thePagePointsList;

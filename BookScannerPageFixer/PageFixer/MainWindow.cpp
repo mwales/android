@@ -12,6 +12,8 @@
 #include "ui_MainWindow.h"
 #include "ImageWriter.h"
 #include "ServerControlDialog.h"
+#include "ImageWriter.h"
+#include "PdfWriter.h"
 
 MainWindow::MainWindow(QWidget *parent) :
    QMainWindow(parent),
@@ -255,6 +257,19 @@ void MainWindow::updatePicture()
 
 void MainWindow::processImages()
 {
+   DocumentWriter* dw = new ImageWriter();
+   startDocumentWriting(dw);
+
+}
+
+void MainWindow::writePdf()
+{
+   DocumentWriter* dw = new PdfWriter();
+   startDocumentWriting(dw);
+}
+
+void MainWindow::startDocumentWriting(DocumentWriter* dw)
+{
    qDebug() << __PRETTY_FUNCTION__;
 
    if (theImageFiles.empty())
@@ -315,7 +330,6 @@ void MainWindow::processImages()
    ui->theImagesProcessedPb->setValue(0);
 
    // Setup the document writer with the data it needs for processing
-   DocumentWriter* dw = new ImageWriter();
    dw->setOutputInfo(outputDir, prefix);
    dw->setImageData(theImagePath, theImageFiles);
    dw->setSelectionInfo(thePagePointsList);
@@ -393,7 +407,4 @@ void MainWindow::openDirectoryChooser()
     loadImagePath(dir);
 }
 
-void MainWindow::writePdf()
-{
 
-}

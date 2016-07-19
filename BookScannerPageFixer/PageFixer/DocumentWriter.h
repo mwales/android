@@ -47,6 +47,8 @@ protected:
 
    virtual bool processImage(QPixmap const & imageData) = 0;
 
+   virtual bool documentClose() { return true; }
+
    QString theImagesPath;
 
    QStringList theImageList;

@@ -55,9 +55,18 @@ void DocumentWriter::run()
       emit JobPercentComplete(thePageCounter, TOTAL_PAGES);
    }
 
+   if (!documentClose())
+   {
+      qDebug() << "Error while closing the document";
+      emit JobFailed("Failed to close document");
+      return;
+   }
+
    qDebug() << __PRETTY_FUNCTION__ << " wrote " << thePageCounter << " pages";
 
    emit JobSuccessful();
+
+   this->deleteLater();
 }
 
 void DocumentWriter::setImageData(const QString& imagePath, const QStringList& imageList)
